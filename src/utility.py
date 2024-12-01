@@ -32,3 +32,39 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
         value = ""
 
     return LeafNode(tag=tag, value=value, props=props)
+    
+def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: TextType):
+    if not isinstance(old_nodes, list):
+        raise TypeError("old_nodes must be a list")
+
+    if not isinstance(delimiter, str):
+        raise TypeError("delimiter must be a string")
+
+    if not isinstance(text_type, TextType):
+        raise TypeError("text_type must be a TextType")
+    
+    tag_map = {
+        TextType.Bold: "**",
+        TextType.Italic: "*",
+        TextType.Code: "`",
+    }
+    
+    tag = tag_map[text_type]
+    
+    nodes = []
+    for node in old_nodes:
+        text = node.text
+        if text == None:
+            continue
+        if delimiter == tag and delimiter in text:
+            parts = text.split(delimiter)
+            for index, part in enumerate(parts):
+                if part:
+                    if index % 2 == 0:
+                        nodes.append(TextNode(part, TextType.Text))
+                    else:
+                        nodes.append(TextNode(part, text_type))
+            continue
+        nodes.append(node)
+    return nodes
+        
